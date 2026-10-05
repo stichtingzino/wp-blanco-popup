@@ -1,26 +1,36 @@
 name: Generate WordPress Plugin Release
 
 on:
-  release:
-    types: [published] # Triggert zodra je handmatig een release publiceert op GitHub
+  push:
+    branches:
+      - main # Triggert automatisch bij een push of merge naar main
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Cruciaal om de zip aan de release te mogen hangen
+      contents: write # Cruciaal om de tag en release te mogen aanmaken en de ZIP te uploaden
 
     steps:
-      # v7 is de actuele stabiele versie die volledig op de Node 24+ runner draait
+      # v7 is de actuele stabiele versie
       - name: Checkout code
         uses: actions/checkout@v7
+
+      # Stap die het versienummer uit je hoofd-PHP-bestand haalt
+      - name: Extract WordPress Plugin Version
+        id: get_version
+        run: |
+          # Vervang 'plugin-naam.php' door de echte naam van jouw hoofdbestand!
+          VERSION=$(grep -i "Version:" plugin-naam.php | head -n 1 | sed -E 's/.*Version:[[:space:]]*//' | tr -d '\r ')
+          echo "PLUGIN_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Gevonden versie: $VERSION"
 
       # v7 configureert de Node-omgeving native op de modernste runtime
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '26'
-          cache: 'npm' # Automatische caching voor snellere builds
+          node-version: '22' # LTS versie 22 is momenteel de stabiele standaard voor WordPress builds
+          cache: 'npm'       # Automatische caching voor snellere builds
 
       - name: Install dependencies & Build assets
         run: |
@@ -29,22 +39,29 @@ jobs:
 
       # Maakt een schone zip van de plugin met de repo-naam als mapnaam
       - name: Create WordPress Plugin ZIP
-        uses: thewwpod/wordpress-plugin-asset-action@v2
-        with:
-          filename: '${{ github.event.repository.name }}.zip'
-          exclude: |
-            .git*
-            .github/*
-            node_modules/*
-            src/*
-            package.json
-            package-lock.json
-            sync.sh
+        shell: bash
+        run: |
+          mkdir -p "/tmp/plugin-build"
+          rsync -a --delete \
+            --exclude='.git*' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='src' \
+            --exclude='package.json' \
+            --exclude='package-lock.json' \
+            --exclude='sync.sh' \
+            ./ "/tmp/plugin-build/${{ github.event.repository.name }}/"
+          cd "/tmp/plugin-build"
+          zip -r "${{ github.event.repository.name }}.zip" "${{ github.event.repository.name }}"
 
-      # v3 is de nieuwste stabiele release voor gh-release, volledig compatibel met Node 24+
-      - name: Upload ZIP to Release
+      # v3 is de nieuwste stabiele release voor gh-release
+      - name: Create and Upload to GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           files: '${{ github.event.repository.name }}.zip'
+          tag_name: 'v${{ github.run_number }}' # Maakt automatisch een unieke tag aan (bijv. v1, v2)
+          name: 'Release v${{ github.run_number }}'
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
