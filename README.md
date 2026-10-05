@@ -1,11 +1,11 @@
 # WP Blanco Popup
 
-A lightweight WordPress plugin designed to easily add clean, blank popup functionality to your website.
+A lightweight WordPress plugin designed to load specific pages inside a clean, borderless popup window by stripping away the default theme header, footer, and sidebars using a URL parameter.
 
 ## 🚀 Features
-* **Lightweight & Fast:** Zero bloat, no heavy frameworks or unnecessary scripts.
-* **Automated Releases:** Automatically generates an optimized production `.zip` archive on every merge to the `main` branch.
-* **No Node/NPM Required:** Pure PHP/JS workflow with no build steps needed.
+* **Theme Stripper (Blank Mode):** Automatically intercepts requests with `?popup=true` and serves a clean, core-only HTML wrapper without theme headers or footers.
+* **Centered Popup Windows:** Includes a helper JavaScript function to trigger perfectly centered standalone browser windows with hidden navigation toolbars.
+* **Automated Releases:** Generates an optimized production `.zip` archive on every merge to the `main` branch via GitHub Actions.
 
 ## 📦 Installation
 
@@ -20,29 +20,23 @@ A lightweight WordPress plugin designed to easily add clean, blank popup functio
 
 ## 💡 Usage
 
-You can display and trigger the blank popup anywhere on your site using the methods below:
+To open any WordPress page inside the blank popup window, you can use the built-in JavaScript function `openWordPressPopup`.
 
-### 1. Shortcode
-Insert the popup content anywhere inside your post or page editor:
-```wordpress
-[blanco_popup id="my-popup"]
-   <h3>Your Popup Title</h3>
-   <p>This is the blank content inside your custom popup.</p>
-[/blanco_popup]
-```
+### 1. Triggering via HTML Links
+Add an `onclick` event to any link or button. Pass the event and the destination URL into the function:
 
-### 2. Triggering the Popup
-To open the popup, add the class `open-blanco-popup` to any button, link, or menu item, and match the target ID:
 ```html
-<a href="#my-popup" class="open-blanco-popup">Click here to open popup</a>
+<a href="https://://yourwebsite.com" 
+   onclick="openWordPressPopup(event, this.href, 800, 600);">
+   Open Blank Page
+</a>
 ```
+*The script will automatically append `?popup=true` to the URL, center the window on the user's screen, and hide browser toolbars/menus.*
 
-### 3. Theme Template (PHP)
-If you want to hardcode the popup directly into your theme templates (e.g., `footer.php`):
-```php
-<?php 
-echo do_shortcode('[blanco_popup id="footer-popup"]<p>Global Footer Notice</p>[/blanco_popup]'); 
-?>
+### 2. Manual URL Access
+If you want to view the stripped-down, blanco version of a page inside a regular browser tab without opening a new window, simply append the parameter manually to your URL:
+```text
+https://://yourwebsite.com
 ```
 
 ---
@@ -85,13 +79,14 @@ This repository uses **GitHub Actions** to automate production releases. To ensu
 6. **Merge & Automated Release**  
    Once approved and merged into `main`, the GitHub workflow instantly triggers to:
    * Read the new version string directly from `wp-blanco-popup.php`.
-   * Bundle the plugin files into a clean archive (excluding `.git`, `.github`, and dev utilities).
+   * Bundle the plugin files into a clean archive using standard `zip` utilities (excluding `.git` and `.github`).
    * Create an official GitHub release tagged `v1.0.1` containing your ready-to-install `.zip`.
 
 ---
 
 ## 📂 Repository Structure
 
-* `wp-blanco-popup.php` - Main plugin file containing header information and core functionality.
+* `wp-blanco-popup.php` - Main plugin file containing header information and backend hooks.
+* `js/popup.js` - Central JavaScript function handling window sizing and instantiation.
 * `.github/workflows/release.yml` - CI/CD automated workflow file.
 * `README.md` - Documentation and setup guide.
