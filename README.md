@@ -38,6 +38,13 @@ If you want to view the stripped-down, blanco version of a page inside a regular
 ```text
 https://yourwebsite.com/your-target-page/?popup=true
 ```
+### 3. Using the Shortcode
+You can easily generate popup links inside the WordPress block editor or classic editor using the `[mb_popup]` shortcode:
+
+```wordpress
+[mb_popup src="https://yourwebsite.com/yourwebpage" width=800 height=600]Clickable text[/mb_popup]
+```
+*Note: The plugin automatically strips the header and footer by default when loading the popup, so manual header/footer arguments are not required.*
 
 ---
 
