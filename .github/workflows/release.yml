@@ -19,7 +19,6 @@ jobs:
       - name: Extract WordPress Plugin Version
         id: get_version
         run: |
-          # BELANGRIJK: Vervang 'wp-blanco-popup.php' door jouw echte PHP-bestandsnaam!
           VERSION=$(grep -i "Version:" wp-blanco-popup.php | head -n 1 | sed -E 's/.*Version:[[:space:]]*//' | tr -d '\r ')
           echo "PLUGIN_VERSION=$VERSION" >> $GITHUB_ENV
           echo "Gevonden versie: $VERSION"
@@ -42,8 +41,8 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           files: '${{ github.event.repository.name }}.zip'
-          tag_name: 'v${{ steps.get_version.outputs.version }}'
-          name: 'Release v${{ steps.get_version.outputs.version }}'
+          tag_name: 'v${{ env.PLUGIN_VERSION }}'
+          name: 'Release v${{ env.PLUGIN_VERSION }}'
           draft: false
           prerelease: false
         env:
