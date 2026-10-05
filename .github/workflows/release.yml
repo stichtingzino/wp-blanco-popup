@@ -19,8 +19,8 @@ jobs:
       - name: Extract WordPress Plugin Version
         id: get_version
         run: |
-          # BELANGRIJK: Vervang 'plugin-naam.php' door jouw echte PHP-bestandsnaam!
-          VERSION=$(grep -i "Version:" plugin-naam.php | head -n 1 | sed -E 's/.*Version:[[:space:]]*//' | tr -d '\r ')
+          # BELANGRIJK: Vervang 'wp-blanco-popup.php' door jouw echte PHP-bestandsnaam!
+          VERSION=$(grep -i "Version:" wp-blanco-popup.php | head -n 1 | sed -E 's/.*Version:[[:space:]]*//' | tr -d '\r ')
           echo "PLUGIN_VERSION=$VERSION" >> $GITHUB_ENV
           echo "Gevonden versie: $VERSION"
 
