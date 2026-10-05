@@ -26,20 +26,24 @@ jobs:
 
       # Maakt direct een schone zip van de plugin
       - name: Create WordPress Plugin ZIP
-        uses: thewwpod/wordpress-plugin-asset-action@v2
-        with:
-          filename: '${{ github.event.repository.name }}.zip'
-          exclude: |
-            .git*
-            .github/*
+        shell: bash
+        run: |
+          ZIP_NAME="${{ github.event.repository.name }}.zip"
+          rm -f "$ZIP_NAME"
+          zip -r "$ZIP_NAME" . \
+            -x ".git/*" \
+            -x ".github/*" \
+            -x "*.zip" \
+            -x "node_modules/*"
+          ls -lh "$ZIP_NAME"
 
       # Maakt de release aan en uploadt de ZIP
       - name: Create and Upload to GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           files: '${{ github.event.repository.name }}.zip'
-          tag_name: 'v${{ env.PLUGIN_VERSION }}'
-          name: 'Release v${{ env.PLUGIN_VERSION }}'
+          tag_name: 'v${{ steps.get_version.outputs.version }}'
+          name: 'Release v${{ steps.get_version.outputs.version }}'
           draft: false
           prerelease: false
         env:
