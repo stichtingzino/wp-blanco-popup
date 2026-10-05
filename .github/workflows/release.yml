@@ -1,0 +1,50 @@
+name: Generate WordPress Plugin Release
+
+on:
+  release:
+    types: [published] # Triggert zodra je handmatig een release publiceert op GitHub
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Cruciaal om de zip aan de release te mogen hangen
+
+    steps:
+      # v7 is de actuele stabiele versie die volledig op de Node 24+ runner draait
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      # v7 configureert de Node-omgeving native op de modernste runtime
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '26'
+          cache: 'npm' # Automatische caching voor snellere builds
+
+      - name: Install dependencies & Build assets
+        run: |
+          npm ci
+          npm run build
+
+      # Maakt een schone zip van de plugin met de repo-naam als mapnaam
+      - name: Create WordPress Plugin ZIP
+        uses: thewwpod/wordpress-plugin-asset-action@v2
+        with:
+          filename: '${{ github.event.repository.name }}.zip'
+          exclude: |
+            .git*
+            .github/*
+            node_modules/*
+            src/*
+            package.json
+            package-lock.json
+            sync.sh
+
+      # v3 is de nieuwste stabiele release voor gh-release, volledig compatibel met Node 24+
+      - name: Upload ZIP to Release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: '${{ github.event.repository.name }}.zip'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
