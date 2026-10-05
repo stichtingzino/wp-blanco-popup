@@ -1,6 +1,8 @@
 <?php
 /**
  * Plugin Name: WP Blanco Popup
+ * Plugin URI:        https://github.com/stichtingzino/wp-blanco-popup
+ * GitHub Plugin URI: https://github.com/stichtingzino/wp-blanco-popup
  * Description: Toont specifieke pagina's zonder header en footer in een strak pop-up venster via een URL-parameter of shortcode.
  * Version:     1.1.0
  * Author:      Mark Blom
