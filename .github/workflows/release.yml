@@ -3,64 +3,43 @@ name: Generate WordPress Plugin Release
 on:
   push:
     branches:
-      - main # Triggert automatisch bij een push of merge naar main
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Cruciaal om de tag en release te mogen aanmaken en de ZIP te uploaden
+      contents: write
 
     steps:
-      # v7 is de actuele stabiele versie
       - name: Checkout code
         uses: actions/checkout@v7
 
-      # Stap die het versienummer uit je hoofd-PHP-bestand haalt
+      # Haalt het versienummer rechtstreeks uit je hoofd-PHP-bestand
       - name: Extract WordPress Plugin Version
         id: get_version
         run: |
-          # Vervang 'plugin-naam.php' door de echte naam van jouw hoofdbestand!
+          # BELANGRIJK: Vervang 'plugin-naam.php' door jouw echte PHP-bestandsnaam!
           VERSION=$(grep -i "Version:" plugin-naam.php | head -n 1 | sed -E 's/.*Version:[[:space:]]*//' | tr -d '\r ')
           echo "PLUGIN_VERSION=$VERSION" >> $GITHUB_ENV
           echo "Gevonden versie: $VERSION"
 
-      # v7 configureert de Node-omgeving native op de modernste runtime
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: '22' # LTS versie 22 is momenteel de stabiele standaard voor WordPress builds
-          cache: 'npm'       # Automatische caching voor snellere builds
-
-      - name: Install dependencies & Build assets
-        run: |
-          npm ci
-          npm run build
-
-      # Maakt een schone zip van de plugin met de repo-naam als mapnaam
+      # Maakt direct een schone zip van de plugin
       - name: Create WordPress Plugin ZIP
-        shell: bash
-        run: |
-          mkdir -p "/tmp/plugin-build"
-          rsync -a --delete \
-            --exclude='.git*' \
-            --exclude='.github' \
-            --exclude='node_modules' \
-            --exclude='src' \
-            --exclude='package.json' \
-            --exclude='package-lock.json' \
-            --exclude='sync.sh' \
-            ./ "/tmp/plugin-build/${{ github.event.repository.name }}/"
-          cd "/tmp/plugin-build"
-          zip -r "${{ github.event.repository.name }}.zip" "${{ github.event.repository.name }}"
+        uses: thewwpod/wordpress-plugin-asset-action@v2
+        with:
+          filename: '${{ github.event.repository.name }}.zip'
+          exclude: |
+            .git*
+            .github/*
 
-      # v3 is de nieuwste stabiele release voor gh-release
+      # Maakt de release aan en uploadt de ZIP
       - name: Create and Upload to GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           files: '${{ github.event.repository.name }}.zip'
-          tag_name: 'v${{ github.run_number }}' # Maakt automatisch een unieke tag aan (bijv. v1, v2)
-          name: 'Release v${{ github.run_number }}'
+          tag_name: 'v${{ env.PLUGIN_VERSION }}'
+          name: 'Release v${{ env.PLUGIN_VERSION }}'
           draft: false
           prerelease: false
         env:
