@@ -46,3 +46,4 @@ wp-config.php
 # uncomment the next line
 #/wp-content/themes
 .github/.DS_Store
+.DS_Store
