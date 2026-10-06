@@ -1,7 +1,8 @@
 /**
  * Centrale functie om WordPress pagina's in een strakke popup te openen
+ * Nu standaard ingesteld op een breedte van 800px en hoogte van 600px
  */
-function openWordPressPopup(event, url, breedte = 700, hoogte = 500) {
+function openWordPressPopup(event, url, breedte = 800, hoogte = 600) {
     if (event) event.preventDefault();
     
     // Voeg de popup-parameter toe aan de URL
