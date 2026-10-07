@@ -1,6 +1,8 @@
 <?php
 /**
  * Plugin Name: WP Blanco Popup
+ * Plugin URI:        https://github.com/stichtingzino/wp-blanco-popup
+ * Github Plugin URI: https://github.com/stichtingzino/wp-blanco-popup
  * Description: Generic plugin that displays specific pages without header navigation and footer in a fluid responsive layout via a proxy-safe URL parameter.
  * Version:     1.1.2
  * Author:      Mark Blom
