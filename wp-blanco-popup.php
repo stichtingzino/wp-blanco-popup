@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP Blanco Popup
  * Description: Generic plugin that displays specific pages without header navigation and footer in a fluid responsive layout via a proxy-safe URL parameter.
- * Version:     1.1.1
+ * Version:     1.1.2
  * Author:      Mark Blom
  */
 
