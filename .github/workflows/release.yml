@@ -30,8 +30,7 @@ jobs:
           ZIP_NAME="${{ github.event.repository.name }}.zip"
           rm -f "$ZIP_NAME"
           zip -r "$ZIP_NAME" . \
-            -x ".git/*" \
-            -x ".github/*" \
+            -x ".git*" \
             -x "*.zip" \
             -x "node_modules/*"
           ls -lh "$ZIP_NAME"
